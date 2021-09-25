@@ -7,25 +7,26 @@ echo "Updating ubuntu pacakges";
 sudo apt update -y
 sudo apt upgrade -y
 echo "Starting setup process";
-echo "Downloading rtmp module.";
-cd ~ && git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git
-echo "${green} Download complete. ${reset}";
 echo "Installing dependancies.";
 sudo apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev -y nload
-echo "${green} Intalling dependancie complete. ${reset}";
-echo "Downloading nginx.";
-cd ~ && wget http://nginx.org/download/nginx-1.18.0.tar.gz
-echo "Download complete.";
+echo "Intalling dependancie complete.";
+echo "Downloading rtmp module and files.";
+git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git
+wget http://nginx.org/download/nginx-1.18.0.tar.gz
+curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.conf > nginx.conf;
+curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.service > nginx.service;
+echo "${green} Download complete. ${reset}";
 tar -xf nginx-1.18.0.tar.gz
-echo "Unziped and deleted arhive.";
 rm -rf nginx-1.18.0.tar.gz
+echo "Unziped and deleted arhive.";
 echo "Configuration rtmp.This might take some time...";
-cd ~/nginx-1.18.0 && ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module
-echo "${green} Configuration rtmp done.OK ${reset}";
+cd nginx-1.18.0 && ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module
+echo "Configuration rtmp done.OK";
 echo "Running install....."
-sudo cd ~/nginx-1.18.0 && make;
-sudo cd ~/nginx-1.18.0 && make install;
-echo "${green} Nginx-Rtmp setup complete. ${reset}";
+sudo make
+sudo make install
+cd ..
+echo "Nginx-Rtmp setup complete.";
 echo "Renaming existing conf file and creating new conf"
 mv /usr/local/nginx/conf/nginx.conf /usr/local/nginx/conf/original.nginx.conf
 mv nginx.conf /usr/local/nginx/conf/;
@@ -41,20 +42,31 @@ systemctl daemon-reload
 echo "${green} Setup completed.OK ${reset}";
 echo "=======================================================================================";
 echo "=======================================================================================";
+echo "=======================================================================================";
 echo "Installing node environment";
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh;
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash;
+cd ~;
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
+sleep 5s;
+sudo chmod +x 777 nvminstall.sh
+sh nvminstall.sh
+sleep 5s;
 sudo source ~/.bashrc;
+sleep 5s;
 nvm install v14.17.5;
-echo "${green}Installing done.OK";
-echo "Setting up load job";
-cd ~/ && git clone https://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@github.com/harik-6/rtmpload.git;
-cd ~/rtmpload && npm install;
-echo "${green} Node modules installation done.OK";
+echo "${green} Installing done.OK ${reset}";
+echo "Setting up load job".;
+echo "Downloading git repo.";
+git clone https://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@github.com/harik-6/rtmpload.git;
+sleep 10s;
+echo "${green} Git repo download success.OK ${reset}";
+echo "Installing node modules.";
+cd rtmpload;
+npm install;
+echo "${green} Node modules installation done.OK ${reset}";
 echo "Adding pm2 to start up"
-cd ~/rtmpload && npm install pm2 -g;
-cd ~/rtmpload && pm2 startup;
-echo "${green} Server setup done.OK";
+npm install pm2 -g;
+pm2 startup;
+echo "${green} Server setup done.OK ${reset}";
 echo "Start running server by running following commands";
 echo "1)cd ~/rtmpload";
 echo "2)pm2 start load.js --name=loadjob";
@@ -62,6 +74,7 @@ echo "==========================================================================
 echo "=======================================================================================";
 echo "Start configuring ssl"; 
 echo "Using let's encrypt to add ssl certificate"; 
+cd ~;
 snap install core
 snap refresh core
 snap install --classic certbot
