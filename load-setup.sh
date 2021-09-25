@@ -1,15 +1,22 @@
 echo "Installing node environment";
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh;
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash;
+cd ~;
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
 sleep 5s;
-sudo source ~/.bashrc;
+chmod +x nvminstall.sh
+sh nvminstall.sh
+sleep 5s;
+source ~/.bashrc;
 sleep 5s;
 nvm install v14.17.5;
+rm nvminstall.sh
 echo "${green} Installing done.OK ${reset}";
-echo "Setting up load job";
-cd ~/;
+echo "Setting up load job".;
+echo "Downloading git repo.";
 git clone https://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@github.com/harik-6/rtmpload.git;
-echo "${green} Git clone success.OK ${reset}";
+sleep 10s;
+echo "${green} Git repo download success.OK ${reset}";
+echo "Installing node modules.";
+cd rtmpload;
 npm install;
 echo "${green} Node modules installation done.OK ${reset}";
 echo "Adding pm2 to start up"
