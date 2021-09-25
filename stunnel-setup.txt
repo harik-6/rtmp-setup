@@ -1,0 +1,35 @@
+step1 : install sudo apt install stunnel4 -y
+step2 : go to stunnel directory `cd /etc/stunnel`
+step2 : create configuration file `nano stunnel.conf`
+step4 : copy paste the below content
+        #verify = 2
+	#CAfile = /etc/ssl/certs/ca-certificates.crt
+	#setuid = stunnel
+	#setgid = stunnel
+	pid=/tmp/stunnel.pid
+	output = /etc/stunnel/stunnel.log
+	#include = /usr/local/etc/man sstunnel/conf.d
+
+	[fb-live]
+	client = yes
+	accept = 127.0.0.1:19350
+	connect = live-api-s.facebook.com:443
+	verifyChain = no
+	#cert = /etc/stunnel/stunnel.pem
+step5 : create a log file `nano stunnel.log`
+step6 : add permission to log file `chmod 777 stunnel.log`
+step7 : open stunnel startup configuration file `nano /etc/default/stunnel4`
+step8 : change ENABLED=0 to ENABLED=1
+step9 : run `/etc/init.d/stunnel4 restart`
+step10 : restart stunnel  `systemctl restart stunnel4`
+step9 : check stunnel status  `/systemctl status stunnel4`
+=========================================================================
+If certificate is needed
+openssl genrsa -out key.pem 2048
+openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
+
+REFERENCE WEBSITE LINKS
+REFER TO https://www.digitalocean.com/community/tutorials/how-to-set-up-an-ssl-tunnel-using-stunnel-on-ubuntu
+REFER TO https://dev.to/lax/rtmps-relay-with-stunnel-12d3
+REFER TO https://github.com/arut/nginx-rtmp-module/issues/1397

@@ -1,0 +1,17 @@
+echo "Installing nodejs and npm";
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh;
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash;
+source ~/.bashrc;
+nvm install v14.17.5;
+echo "==================================================================================";
+echo "Adding pm2 to startup";
+npm install pm2 -g;
+pm2 startup;
+echo "==================================================================================";
+echo "Setting up load job";
+cd ~/loaddir && npm install;
+echo "Server setup done.OK";
+echo "==================================================================================";
+echo "Start running server by running following commands";
+echo "1)cd ~/loaddir";
+echo "2)pm2 start load.js --name loadjob";

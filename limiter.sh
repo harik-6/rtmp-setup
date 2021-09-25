@@ -1,0 +1,17 @@
+sudo apt install speedtest-cli;
+echo "Speed before limiter";
+speedtest-cli;
+cd /bin;
+git clone https://github.com/magnific0/wondershaper.git;
+cd wondershaper;
+sudo make install;
+sudo systemctl enable wondershaper.service;
+echo "Enter inbound limit";
+read inbound;
+echo "Enter outbound limit";
+read outbound;
+sudo wondershaper -a eth0 -d $outbound -u $inbound;
+sudo systemctl start wondershaper.service;
+sudo systemctl status wondershaper.service;
+echo "Speed after limiter";
+speedtest-cli;
