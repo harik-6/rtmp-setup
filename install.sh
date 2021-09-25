@@ -67,6 +67,7 @@ sh nvminstall.sh
 sleep 5s;
 export NVM_DIR="$HOME/.nvm";
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion";
 echo "Installing node v14.17.5";
 nvm install v14.17.5;
 rm nvminstall.sh
@@ -90,4 +91,3 @@ echo "2)pm2 start load.js --name=loadjob";
 echo "RTMP Setup completed.Start streaminggggg!!!!";
 echo "=======================================================================================";
 echo "=======================================================================================";
-exec bash;
