@@ -87,9 +87,6 @@ echo "Adding pm2 to start up"
 npm install pm2 -g;
 pm2 startup;
 echo "${green} Server setup done.OK ${reset}";
-echo "Start running server by running following commands";\
-echo "1)cd ~/rtmpload";
-echo "2)pm2 start load.js --name=loadjob";
-echo "RTMP Setup completed.Start streaminggggg!!!!";
+cd rtmpload && pm2 start load.js --name=loadjob
 echo "=======================================================================================";
 echo "=======================================================================================";
