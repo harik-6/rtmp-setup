@@ -5,6 +5,7 @@ ENV PATH $PATH:/usr/local/nginx/sbin
 
 EXPOSE 1935
 EXPOSE 80
+EXPOSE 443
 
 # create directory
 RUN mkdir /src
@@ -36,22 +37,14 @@ RUN mkdir /nginx
 RUN mkdir /nginx/hls
 RUN chown -R www-data:www-data /nginx
 
-# adding nginx as service
-RUN mv nginx.service /lib/systemd/system/nginx.service
-RUN systemctl enable nginx
-RUN systemctl daemon-reload
-
 # installing node v14
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
-RUN apt-get install nodejs -y
+RUN apt-get install -y --force-yes nodejs 
 
 # installing load application
 RUN git clone https://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@github.com/harik-6/rtmpload.git;
 WORKDIR /src/rtmpload
 RUN npm install
-RUN pm install pm2 -g;
-RUN pm2 startup;
-RUN pm2 start load.js --name=loadjob
 
 # adding nginx.conf file, should be last step
 WORKDIR /
