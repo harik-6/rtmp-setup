@@ -49,6 +49,9 @@ RUN apt-get install nodejs -y
 RUN git clone https://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@github.com/harik-6/rtmpload.git;
 WORKDIR /src/rtmpload
 RUN npm install
+RUN pm install pm2 -g;
+RUN pm2 startup;
+RUN pm2 start load.js --name=loadjob
 
 # adding nginx.conf file, should be last step
 WORKDIR /
