@@ -3,10 +3,6 @@ FROM ubuntu:trusty
 ENV DEBIAN_FRONTEND noninteractive
 ENV PATH $PATH:/usr/local/nginx/sbin
 
-EXPOSE 1935
-EXPOSE 80
-EXPOSE 443
-
 # create directory
 RUN mkdir /src
 
@@ -42,14 +38,22 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
 RUN apt-get install -y --force-yes nodejs 
 
 # installing load application
+WORKDIR /src
 RUN git clone https://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@github.com/harik-6/rtmpload.git;
 WORKDIR /src/rtmpload
 RUN npm install
+RUN npm install pm2 -g
+
+# exposing ports
+EXPOSE 1935
+EXPOSE 80
+EXPOSE 443
 
 # adding nginx.conf file, should be last step
 WORKDIR /
 RUN mv /usr/local/nginx/conf/nginx.conf /usr/local/nginx/conf/original.nginx.conf
 ADD nginx.conf /usr/local/nginx/conf/nginx.conf
+RUN echo "daemon off;" >> /usr/local/nginx/conf/nginx.conf
 
 WORKDIR /
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx"]
