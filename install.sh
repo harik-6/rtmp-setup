@@ -13,9 +13,9 @@ echo "Intalling dependancie complete.";
 echo "Downloading rtmp module and files.";
 git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git
 wget http://nginx.org/download/nginx-1.18.0.tar.gz
-curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.conf > nginx.conf;
-curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.service > nginx.service;
-curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/stat.xsl > stat.xsl;
+curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.conf > nginx.conf;
+curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/nginx.service > nginx.service;
+curl -o- https://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@raw.githubusercontent.com/harik-6/rtmpsetup/main/stat.xsl > stat.xsl;
 echo "${green} Download complete. ${reset}";
 tar -xf nginx-1.18.0.tar.gz
 rm -rf nginx-1.18.0.tar.gz
