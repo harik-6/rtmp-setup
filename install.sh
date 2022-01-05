@@ -8,7 +8,7 @@ sudo apt update -y
 sudo apt upgrade -y
 echo "Starting setup process";
 echo "Installing dependancies.";
-sudo apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev -y nload
+sudo apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev nload wondershaper -y
 echo "Intalling dependancie complete.";
 echo "Downloading rtmp module and files.";
 git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git
@@ -76,7 +76,7 @@ rm nvminstall.sh
 echo "${green} Installing done.OK ${reset}";
 echo "Setting up load job".;
 echo "Downloading git repo.";
-git clone https://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@github.com/harik-6/rtmpload.git;
+git clone https://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@github.com/harik-6/rtmpload.git;
 sleep 10s;
 echo "${green} Git repo download success.OK ${reset}";
 echo "Installing node modules.";
