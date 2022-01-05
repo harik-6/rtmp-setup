@@ -76,7 +76,7 @@ rm nvminstall.sh
 echo "${green} Installing done.OK ${reset}";
 echo "Setting up load job".;
 echo "Downloading git repo.";
-git clone https://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@github.com/harik-6/rtmpload.git;
+git clone https://github.com/harik-6/rtmpload.git;
 sleep 10s;
 echo "${green} Git repo download success.OK ${reset}";
 echo "Installing node modules.";
