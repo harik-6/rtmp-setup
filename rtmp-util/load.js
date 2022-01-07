@@ -23,7 +23,6 @@ app.use(helmet());
 // HLS COUNT JOB
 const hlsCountJob = async () => {
   try {
-    console.log("Hls count job started");
     const logMap = {};
     const logData = fs.readFileSync(NGINX_ACCESS_FILE, { encoding: "utf8" });
     const stringyfied = logData.toString();
@@ -56,7 +55,6 @@ const hlsCountJob = async () => {
       ipCountMap[key] = ipMap[key].length;
     }
     const body = {
-      psk: "bfJ-m$gK%]tp9Sa_Wnb2@5HTrFcr!yQV=",
       ipCountMap,
     };
     console.log("Request body", JSON.stringify(body));
@@ -70,9 +68,8 @@ const hlsCountJob = async () => {
           },
         }
       );
-      console.log("Request success");
     } catch (resErr) {
-      console.log("Error in request", resErr.message);
+      console.log("Error in sending request", resErr.message);
     }
     exec(`cat /dev/null > ${NGINX_ACCESS_FILE}`, (err, _param1, _param2) => {
       if (err) {
@@ -89,7 +86,6 @@ const hlsCountJob = async () => {
 
 const startHlsCountCronJob = () => {
   // Running every 1 hour to update hls count
-  console.log("Setting up hls count cron.");
   let HLSCOUNT_JOB = new CronJob("0 */1 * * *", async () => {
     hlsCountJob();
   });
@@ -100,7 +96,6 @@ const startHlsCountCronJob = () => {
 //=================================
 // BW LIMITER JOB
 const startBWLimitingCron = async () => {
-  console.log("Setting up BW start cron.");
   // Runs everyday at 11PM IST
   let CRON_START_JOB = new CronJob("30 3 * * *", async () => {
     exec("wondershaper eth0 30000 5000", (err, _param1, _param2) => {
@@ -114,7 +109,7 @@ const startBWLimitingCron = async () => {
   });
   // Runs everyday at 6AM IST
   let CRON_STOP_JOB = new CronJob("30 11 * * *", async () => {
-    exec("wondershaper eth0 30000 5000", (err, _param1, _param2) => {
+    exec("wondershaper clear eth0", (err, _param1, _param2) => {
       if (err) {
         console.log("Error in stop limiting BW", error);
         return;
@@ -129,16 +124,43 @@ const startBWLimitingCron = async () => {
 
 //=================================
 
-const sendStartSignal = async () => {
+// to reboot nginx
+app.get("/reboot", async (req, res) => {
   try {
-    await axios.post("https://api.streamwell.in/api/activity/restart");
-  } catch (_) {}
-  return;
-};
+    console.log("Request to restart nginx", new Date().toString());
+    // await axios.post("https://api.streamwell.in/api/activity/restart");
+    exec("systemctl restart nginx", (err, _param1, _param2) => {
+      if (err) {
+        res.status(500).json({
+          status: "failed",
+          error: err.message,
+        });
+        return;
+      }
+      res.status(200).json({
+        status: "success",
+      });
+      return;
+    });
+  } catch (error) {
+    console.log("Error in restarting server", error.message);
+    res.sendStatus(500).end();
+  }
+});
+
+// to health ping
+app.get("/ping", async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    payload: {
+      health: "OK",
+      version: process.env.npm_package_version,
+    },
+  });
+});
 
 const startServer = () => {
   try {
-    console.log("====================================================");
     console.log("Starting server at", new Date().toString());
     startHlsCountCronJob();
     startBWLimitingCron();
@@ -150,29 +172,5 @@ const startServer = () => {
     process.exit(0);
   }
 };
-
-// to reboot nginx
-app.get("/reboot", async (req, res) => {
-  try {
-    console.log("Request to restart nginx", new Date().toString());
-    await sendStartSignal();
-    exec("systemctl restart nginx", (err, _param1, _param2) => {
-      if (err) {
-        res.sendStatus(500).end();
-        return;
-      }
-      res.sendStatus(200).end();
-      return;
-    });
-  } catch (error) {
-    console.log("Error in restarting server", error.message);
-    res.sendStatus(500).end();
-  }
-});
-
-// to health ping
-app.get("/ping", async (req, res) => {
-  res.sendStatus(200).end();
-});
 
 startServer();
