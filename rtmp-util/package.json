@@ -1,10 +1,10 @@
 {
-  "name": "load-server",
+  "name": "util-server",
   "version": "2.1.1",
   "description": "",
-  "main": "load.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node load.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,6 @@
     "helmet": "^4.6.0"
   },
   "engines": {
-    "node": "14.17.5"
+    "node": "16.13.1"
   }
 }
