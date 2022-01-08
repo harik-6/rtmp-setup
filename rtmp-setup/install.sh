@@ -28,16 +28,17 @@ sudo make install
 cd ..
 echo "Nginx-Rtmp setup complete.";
 echo "Renaming existing conf file and creating new conf"
+cd ~
 mv /usr/local/nginx/conf/nginx.conf /usr/local/nginx/conf/original.nginx.conf
-mv rtmp-setup/nginx.conf /usr/local/nginx/conf/;
-mv rtmp-setup/stat.xsl /usr/local/nginx/html/;
+mv rtmp-setup/rtmp-setup/nginx.conf /usr/local/nginx/conf/;
+mv rtmp-setup/rtmp-setup/stat.xsl /usr/local/nginx/html/;
 echo "Creating hls drirectory and adding root access";
 cd /usr/local/nginx/conf && sudo mkdir /nginx
 sudo mkdir /nginx/hls
 sudo chown -R www-data:www-data /nginx
 cd ~
 echo "Adding nginx to startup";
-mv rtmp-setup/nginx.service /lib/systemd/system/nginx.service
+mv rtmp-setup/rtmp-setup/nginx.service /lib/systemd/system/nginx.service
 systemctl enable nginx
 systemctl daemon-reload
 echo "${green} Setup completed.OK ${reset}";
