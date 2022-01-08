@@ -1,18 +1,14 @@
 const express = require("express");
 const helmet = require("helmet");
-const axios = require("axios");
 const fs = require("fs");
-const ip = require("ip");
 
 //exe
-const CronJob = require("cron").CronJob;
 const { exec } = require("child_process");
 
 //variables
 const NGINX_ACCESS_FILE = "/usr/local/nginx/logs/access.log";
 const app = express();
-const PORT = 9000;
-const API = "https://api.streamwell.in/api";
+const PORT = 62331;
 
 // configuring server
 app.use(express.json());
@@ -22,10 +18,32 @@ app.use(
   })
 );
 app.use(helmet());
+// app.use((req, res, next) => {
+//   if (req.headers.origin === "api.streamwell.in") {
+//     next();
+//   } else {
+//     res.status(401).json({
+//       error: "unauthorized",
+//     });
+//   }
+// });
 
 //=================================
-// HLS COUNT JOB
-const hlsCountJob = async () => {
+
+const executeCmd = async (command) => {
+  return new Promise((resolve, reject) => {
+    exec(command, (err, _param1, _param2) => {
+      if (err) {
+        console.log(`failed executing ${command} - ${err.message}`);
+        reject(err);
+      }
+      console.log(`success executing ${command} - ${new Date().toString()}`);
+      resolve("success");
+    });
+  });
+};
+
+const getHlsCount = async () => {
   try {
     const logMap = {};
     const logData = fs.readFileSync(NGINX_ACCESS_FILE, { encoding: "utf8" });
@@ -58,103 +76,15 @@ const hlsCountJob = async () => {
     for (key in ipMap) {
       ipCountMap[key] = ipMap[key].length;
     }
-    const body = {
-      ipCountMap,
-    };
-    console.log("Request body", JSON.stringify(body));
-    try {
-      await axios.post(`${API}/activity/hlscount`, body, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (resErr) {
-      console.log("error in req:post", resErr.message);
-    }
-    exec(`cat /dev/null > ${NGINX_ACCESS_FILE}`, (err, _param1, _param2) => {
-      if (err) {
-        console.log("Error in clearing access log", err);
-      }
-    });
-    console.log("Hls count job ended");
-    return;
+    return ipCountMap;
   } catch (error) {
-    console.log("Error in running hls count job", error);
-    return;
+    throw new Error(error.message);
   }
 };
-
-const startHlsCountCronJob = () => {
-  // Running every 1 hour to update hls count
-  let HLSCOUNT_JOB = new CronJob("0 */1 * * *", async () => {
-    hlsCountJob();
-  });
-  HLSCOUNT_JOB.start();
-};
 //=================================
-
-//=================================
-// BW LIMITER JOB
-const startBWLimitingCron = async () => {
-  // Runs everyday at 11PM IST
-  let CRON_START_JOB = new CronJob("30 3 * * *", async () => {
-    try {
-      const ipaddr = ip.address();
-      const resp = await axios.get(`${API}/server/ip?addr=${ipaddr}`);
-      const { bwIn, bwOut } = resp.payload;
-      exec(`wondershaper eth0 ${bwIn} ${bwOut}`, (err, _param1, _param2) => {
-        if (err) {
-          console.log("error in start limiting BW", err);
-          return;
-        }
-        console.log(`bw limit started in-${bwIn} out-${bwOut}`);
-        return;
-      });
-    } catch (e) {
-      console.log("error in bw start", e.message);
-    }
-  });
-  // Runs everyday at 6AM IST
-  let CRON_STOP_JOB = new CronJob("30 11 * * *", async () => {
-    exec("wondershaper clear eth0", (err, _param1, _param2) => {
-      if (err) {
-        console.log("Error in stop limiting BW", error);
-        return;
-      }
-      console.log("BW limit stopped");
-      return;
-    });
-  });
-  CRON_START_JOB.start();
-  CRON_STOP_JOB.start();
-};
-
-//=================================
-
-// to reboot nginx
-app.get("/reboot", async (req, res) => {
-  try {
-    exec("systemctl restart nginx", (err, _param1, _param2) => {
-      if (err) {
-        res.status(500).json({
-          status: "failed",
-          error: err.message,
-        });
-        return;
-      }
-      res.status(200).json({
-        status: "success",
-      });
-      return;
-    });
-  } catch (error) {
-    console.log("error in reboot request", error.message);
-    res.sendStatus(500).end();
-  }
-});
 
 // to health ping
-app.get("/ping", async (req, res) => {
+app.get("/api/ping", async (_, res) => {
   res.status(200).json({
     status: "success",
     payload: {
@@ -164,12 +94,73 @@ app.get("/ping", async (req, res) => {
   });
 });
 
+//hls count
+app.get("/api/hls", async (_, res) => {
+  try {
+    const count = await getHlsCount();
+    await executeCmd(`cat /dev/null > ${NGINX_ACCESS_FILE}`);
+    res.status(200).json({
+      status: "success",
+      payload: count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      payload: error.message,
+    });
+  }
+});
+
+// start bw
+app.post("/api/bw/start", async (req, res) => {
+  const body = req.body;
+  const { bwIn, bwOut } = body;
+  try {
+    await executeCmd(`wondershaper eth0 ${bwIn} ${bwOut}`);
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
+// stop bw
+app.post("/api/bw/stop", async (_, res) => {
+  try {
+    await executeCmd(`wondershaper clear eth0`);
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
+// to reboot nginx
+app.post("/api/restart", async (req, res) => {
+  try {
+    await executeCmd(`systemctl restart nginx`);
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
 const startServer = () => {
   try {
     console.log("util server started", new Date().toString());
-    // console.log(ip.address());
-    startHlsCountCronJob();
-    startBWLimitingCron();
     app.listen(PORT, () => {
       console.log("util server running on PORT", PORT);
     });
