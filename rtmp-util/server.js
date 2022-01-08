@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const fs = require("fs");
+const packagejson = require("./package.json");
 
 //exe
 const { exec } = require("child_process");
@@ -89,7 +90,7 @@ app.get("/api/ping", async (_, res) => {
     status: "success",
     payload: {
       health: "OK",
-      version: process.env.npm_package_version,
+      version: packagejson["version"],
     },
   });
 });
