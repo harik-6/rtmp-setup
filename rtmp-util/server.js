@@ -113,8 +113,8 @@ app.get("/api/hls", async (_, res) => {
 
 // start bw
 app.post("/api/bw/start", async (req, res) => {
-  const body = req.body;
-  const { bwIn, bwOut } = body;
+  const bwIn = req.query.bwin;
+  const bwOut = req.query.bwout;
   try {
     await executeCmd(`wondershaper eth0 ${bwIn} ${bwOut}`);
     res.status(200).json({
