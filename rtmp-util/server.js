@@ -8,7 +8,7 @@ const { exec } = require("child_process");
 //variables
 const NGINX_ACCESS_FILE = "/usr/local/nginx/logs/access.log";
 const app = express();
-const PORT = 62331;
+const PORT = 9000;
 
 // configuring server
 app.use(express.json());
