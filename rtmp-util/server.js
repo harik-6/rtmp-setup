@@ -2,6 +2,9 @@ const express = require("express");
 const helmet = require("helmet");
 const axios = require("axios");
 const fs = require("fs");
+const ip = require("ip");
+
+//exe
 const CronJob = require("cron").CronJob;
 const { exec } = require("child_process");
 
@@ -9,6 +12,7 @@ const { exec } = require("child_process");
 const NGINX_ACCESS_FILE = "/usr/local/nginx/logs/access.log";
 const app = express();
 const PORT = 9000;
+const API = "https://api.streamwell.in/api";
 
 // configuring server
 app.use(express.json());
@@ -42,7 +46,7 @@ const hlsCountJob = async () => {
           logMap[channel].push(ip);
         }
       } catch (cerr) {
-        console.log(`Error in running hls count for loop - ${log}`, cerr);
+        console.log(`error in running hls count for loop - ${log}`, cerr);
         continue;
       }
     }
@@ -59,17 +63,13 @@ const hlsCountJob = async () => {
     };
     console.log("Request body", JSON.stringify(body));
     try {
-      await axios.post(
-        "https://api.streamwell.in/api/activity/hlscount",
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.post(`${API}/activity/hlscount`, body, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     } catch (resErr) {
-      console.log("Error in sending request", resErr.message);
+      console.log("error in req:post", resErr.message);
     }
     exec(`cat /dev/null > ${NGINX_ACCESS_FILE}`, (err, _param1, _param2) => {
       if (err) {
@@ -98,14 +98,21 @@ const startHlsCountCronJob = () => {
 const startBWLimitingCron = async () => {
   // Runs everyday at 11PM IST
   let CRON_START_JOB = new CronJob("30 3 * * *", async () => {
-    exec("wondershaper eth0 30000 5000", (err, _param1, _param2) => {
-      if (err) {
-        console.log("Error in start limiting BW", error);
+    try {
+      const ipaddr = ip.address();
+      const resp = await axios.get(`${API}/server/ip?addr=${ipaddr}`);
+      const { bwIn, bwOut } = resp.payload;
+      exec(`wondershaper eth0 ${bwIn} ${bwOut}`, (err, _param1, _param2) => {
+        if (err) {
+          console.log("error in start limiting BW", err);
+          return;
+        }
+        console.log(`bw limit started in-${bwIn} out-${bwOut}`);
         return;
-      }
-      console.log("BW limit started");
-      return;
-    });
+      });
+    } catch (e) {
+      console.log("error in bw start", e.message);
+    }
   });
   // Runs everyday at 6AM IST
   let CRON_STOP_JOB = new CronJob("30 11 * * *", async () => {
@@ -127,8 +134,6 @@ const startBWLimitingCron = async () => {
 // to reboot nginx
 app.get("/reboot", async (req, res) => {
   try {
-    console.log("Request to restart nginx", new Date().toString());
-    // await axios.post("https://api.streamwell.in/api/activity/restart");
     exec("systemctl restart nginx", (err, _param1, _param2) => {
       if (err) {
         res.status(500).json({
@@ -143,7 +148,7 @@ app.get("/reboot", async (req, res) => {
       return;
     });
   } catch (error) {
-    console.log("Error in restarting server", error.message);
+    console.log("error in reboot request", error.message);
     res.sendStatus(500).end();
   }
 });
@@ -161,14 +166,15 @@ app.get("/ping", async (req, res) => {
 
 const startServer = () => {
   try {
-    console.log("Starting server at", new Date().toString());
+    console.log("util server started", new Date().toString());
+    // console.log(ip.address());
     startHlsCountCronJob();
     startBWLimitingCron();
     app.listen(PORT, () => {
-      console.log("Load server running on PORT", PORT);
+      console.log("util server running on PORT", PORT);
     });
   } catch (error) {
-    console.log("Error in starting server", error.message);
+    console.log("error in starting util server", error.message);
     process.exit(0);
   }
 };
