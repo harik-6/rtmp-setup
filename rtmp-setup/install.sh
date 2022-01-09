@@ -46,7 +46,7 @@ echo "==========================================================================
 echo "=======================================================================================";
 echo "Start configuring ssl"; 
 echo "Using let's encrypt to add ssl certificate"; 
-cd ~;
+cd ~
 snap install core
 snap refresh core
 snap install --classic certbot
@@ -61,7 +61,7 @@ ls -l /etc/letsencrypt/live/$domainname;
 echo "=======================================================================================";
 echo "=======================================================================================";
 echo "Installing node environment";
-cd ~;
+cd ~
 sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
 sleep 5s;
 chmod +x nvminstall.sh
@@ -75,7 +75,7 @@ nvm install v16.13.1;
 rm nvminstall.sh
 echo "${green} Installing done.OK ${reset}";
 echo "Installing node modules.";
-cd ~/rtmpload;
+cd ~/rtmp-setup/rtmp-util;
 npm install;
 echo "${green} Node modules installation done.OK ${reset}";
 echo "Adding pm2 to start up"
