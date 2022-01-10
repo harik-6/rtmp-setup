@@ -12,8 +12,5 @@
   "dependencies": {
     "express": "^4.17.1",
     "helmet": "^4.6.0"
-  },
-  "engines": {
-    "node": "16.13.1"
   }
 }

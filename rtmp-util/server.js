@@ -31,14 +31,24 @@ app.use(helmet());
 
 //=================================
 
+const logger = {
+  log: (...args) => {
+    console.log(new Date().toString(), args.join(" "));
+  },
+  error: (...args) => {
+    console.error("\x1b[31m", new Date().toString(), args.join(" "), "\x1b[0m");
+  },
+};
+
 const executeCmd = async (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (err, _param1, _param2) => {
       if (err) {
-        console.log(`failed executing ${command} - ${err.message}`);
+        logger.error(`failed executing ${command} - ${err.message}`);
         reject(err);
+        return;
       }
-      console.log(`success executing ${command} - ${new Date().toString()}`);
+      logger.log(`success executing ${command}`);
       resolve("success");
     });
   });
@@ -65,7 +75,7 @@ const getHlsCount = async () => {
           logMap[channel].push(ip);
         }
       } catch (cerr) {
-        console.log(`error in running hls count for loop - ${log}`, cerr);
+        logger.error(`error in running hls count for loop - ${log}`, cerr);
         continue;
       }
     }
@@ -161,12 +171,12 @@ app.post("/api/restart", async (req, res) => {
 
 const startServer = () => {
   try {
-    console.log("util server started", new Date().toString());
+    logger.log("util server started", new Date().toString());
     app.listen(PORT, () => {
-      console.log("util server running on PORT", PORT);
+      logger.log("util server running on PORT", PORT);
     });
   } catch (error) {
-    console.log("error in starting util server", error.message);
+    logger.log("error in starting util server", error.message);
     process.exit(0);
   }
 };
