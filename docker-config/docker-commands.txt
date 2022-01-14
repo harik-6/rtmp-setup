@@ -1,5 +1,0 @@
-docker run -p 1935:1935 -p 80:80 -d --name <container name> <image name>:<image tag>
-docker logs <container name>
-docker exec -it <container name> /bin/bash
-docker rmi <image name>
-docker rm <container name>
