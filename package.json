@@ -1,10 +1,10 @@
 {
   "name": "util-server",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "pm2 stop 0 && pm2 delete 0  && pm2 save --force && pm2 start server.js --name=sw",
+    "start": "pm2 stop 0 && pm2 delete 0  && pm2 save --force && pm2 start server.js --name=sw && pm2 save",
     "dev": "node server.js"
   },
   "keywords": [],
