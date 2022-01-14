@@ -42,7 +42,7 @@ app.get("/api/ping", async (_, res) => {
 });
 
 // stop bw
-app.post("/api/exec", async (_, res) => {
+app.post("/api/exe", async (_, res) => {
   try {
     const command = req.query["cmd"].toString();
     await executeCmd(command);
