@@ -60,10 +60,10 @@ app.post("/api/exec", async (_, res) => {
 (() => {
   try {
     app.listen(PORT, () => {
-      logger.log("server running on PORT", PORT, new Date().toString());
+      console.log("server running on PORT", PORT, new Date().toString());
     });
   } catch (error) {
-    logger.log("error in starting util server", error.message);
+    console.log("error in starting util server", error.message);
     process.exit(0);
   }
 })();
