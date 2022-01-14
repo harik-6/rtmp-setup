@@ -26,6 +26,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm install
-      - run: npm start
-      - run: pm2 stop server
-      - run: pm2 restart server
+      - run: pm2 stop sw
+      - run: pm2 restart sw
