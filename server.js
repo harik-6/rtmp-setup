@@ -58,6 +58,22 @@ app.post("/api/kill", async (_, res) => {
   }
 });
 
+// to reboot nginx
+app.post("/api/restart", async (req, res) => {
+  try {
+    await resetViews();
+    await executeCmd(`systemctl restart nginx`);
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
 // start bw
 app.post("/api/bw/start", async (req, res) => {
   const bwIn = req.query.bwin;
