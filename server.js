@@ -122,7 +122,7 @@ const resetViews = async () => {
     app.listen(PORT, () => {
       console.log("server running on PORT", PORT, new Date().toString());
     });
-    await resetViews();
+    resetViews();
   } catch (error) {
     console.log("error in starting util server", error.message);
     process.exit(0);
