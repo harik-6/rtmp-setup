@@ -41,6 +41,21 @@ app.get("/api/ping", async (_, res) => {
   });
 });
 
+// stop server
+app.post("/api/kill", async (_, res) => {
+  try {
+    await executeCmd(`systemctl stop nginx`);
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
 // start bw
 app.post("/api/bw/start", async (req, res) => {
   const bwIn = req.query.bwin;
@@ -72,6 +87,8 @@ app.post("/api/bw/stop", async (_, res) => {
     });
   }
 });
+
+
 
 (() => {
   try {
