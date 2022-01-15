@@ -1,5 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
+const ip = require("ip");
+const axios = require("axios");
 const packagejson = require("./package.json");
 const { exec } = require("child_process");
 
@@ -88,13 +90,23 @@ app.post("/api/bw/stop", async (_, res) => {
   }
 });
 
-
+//reset views
+const resetViews = () => {
+  try {
+    await axios.post("https://api.streamwell.in/api/view/reset", {
+      ip: ip.address(),
+    });
+  } catch (e) {
+    console.error(`error in reseting views ${e}`);
+  }
+};
 
 (() => {
   try {
     app.listen(PORT, () => {
       console.log("server running on PORT", PORT, new Date().toString());
     });
+    await resetViews();
   } catch (error) {
     console.log("error in starting util server", error.message);
     process.exit(0);
