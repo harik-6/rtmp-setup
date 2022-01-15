@@ -91,7 +91,7 @@ app.post("/api/bw/stop", async (_, res) => {
 });
 
 //reset views
-const resetViews = () => {
+const resetViews = async () => {
   try {
     await axios.post("https://api.streamwell.in/api/view/reset", {
       ip: ip.address(),
