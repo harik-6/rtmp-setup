@@ -1,11 +1,13 @@
 const express = require("express");
 const helmet = require("helmet");
-const ip = require("ip");
-const axios = require("axios");
+const fs = require("fs");
 const packagejson = require("./package.json");
+
+//exe
 const { exec } = require("child_process");
 
 //variables
+const NGINX_ACCESS_FILE = "/usr/local/nginx/logs/access.log";
 const app = express();
 const PORT = 9000;
 
@@ -17,70 +19,95 @@ app.use(
   })
 );
 app.use(helmet());
+// app.use((req, res, next) => {
+//   if (req.headers.origin === "api.streamwell.in") {
+//     next();
+//   } else {
+//     res.status(401).json({
+//       error: "unauthorized",
+//     });
+//   }
+// });
 
-//reset views
-const _resetViews = async () => {
-  try {
-    await axios.post("https://api.streamwell.in/api/view/reset", {
-      ip: ip.address(),
-    });
-  } catch (e) {
-    console.error(`error in reseting views ${e}`);
-  }
-};
+//=================================
 
-const _executeCmd = async (command) => {
+const executeCmd = async (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (err, _param1, _param2) => {
       if (err) {
-        console.error(`failed executing ${command} - ${err.message}`);
+        console.log(`failed executing ${command} - ${err.message}`);
         reject(err);
-        return;
       }
-      console.log(`success executing ${command}`);
+      console.log(`success executing ${command} - ${new Date().toString()}`);
       resolve("success");
     });
   });
 };
+
+const getHlsCount = async () => {
+  try {
+    const logMap = {};
+    const logData = fs.readFileSync(NGINX_ACCESS_FILE, { encoding: "utf8" });
+    const stringyfied = logData.toString();
+    const regexp = /(.*GET \/hls\/.*m3u8)/g;
+    const chregexp = /(\/hls\/.*m3u8)/g;
+    const matches = stringyfied.matchAll(regexp);
+    for (const match of matches) {
+      const log = match[0].toString();
+      try {
+        const ip = log.split(" - - ")[0];
+        const chmatch = log.match(chregexp)[0];
+        const byslash = chmatch.split(".m3u8")[0].split("/");
+        const channel = byslash[byslash.length - 1];
+        if (logMap[channel] === undefined) {
+          logMap[channel] = [ip];
+        } else {
+          logMap[channel].push(ip);
+        }
+      } catch (cerr) {
+        console.log(`error in running hls count for loop - ${log}`, cerr);
+        continue;
+      }
+    }
+    const ipMap = {};
+    const ipCountMap = {};
+    for (key in logMap) {
+      ipMap[key] = [...new Set(logMap[key])];
+    }
+    for (key in ipMap) {
+      ipCountMap[key] = ipMap[key].length;
+    }
+    return ipCountMap;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+//=================================
 
 // to health ping
 app.get("/api/ping", async (_, res) => {
   res.status(200).json({
     status: "success",
     payload: {
-      health: "ok",
+      health: "OK",
       version: packagejson["version"],
     },
   });
 });
 
-// stop server
-app.post("/api/kill", async (_, res) => {
+//hls count
+app.get("/api/hls", async (_, res) => {
   try {
-    await _executeCmd(`systemctl stop nginx`);
+    const count = await getHlsCount();
+    await executeCmd(`cat /dev/null > ${NGINX_ACCESS_FILE}`);
     res.status(200).json({
       status: "success",
+      payload: count,
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({
-      status: "failed",
-      error: err.message,
-    });
-  }
-});
-
-// to reboot nginx
-app.post("/api/restart", async (req, res) => {
-  try {
-    await _resetViews();
-    await _executeCmd(`systemctl restart nginx`);
-    res.status(200).json({
-      status: "success",
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      error: err.message,
+      status: "error",
+      payload: error.message,
     });
   }
 });
@@ -90,7 +117,7 @@ app.post("/api/bw/start", async (req, res) => {
   const bwIn = req.query.bwin;
   const bwOut = req.query.bwout;
   try {
-    await _executeCmd(`wondershaper eth0 ${bwIn} ${bwOut}`);
+    await executeCmd(`wondershaper eth0 ${bwIn} ${bwOut}`);
     res.status(200).json({
       status: "success",
     });
@@ -105,7 +132,7 @@ app.post("/api/bw/start", async (req, res) => {
 // stop bw
 app.post("/api/bw/stop", async (_, res) => {
   try {
-    await _executeCmd(`wondershaper clear eth0`);
+    await executeCmd(`wondershaper clear eth0`);
     res.status(200).json({
       status: "success",
     });
@@ -117,15 +144,31 @@ app.post("/api/bw/stop", async (_, res) => {
   }
 });
 
-(() => {
+// to reboot nginx
+app.post("/api/restart", async (req, res) => {
   try {
-    app.listen(PORT, () => {
-      console.log("server running on PORT", PORT, new Date().toString());
+    await executeCmd(`systemctl restart nginx`);
+    res.status(200).json({
+      status: "success",
     });
-    _resetViews();
-    _executeCmd(`systemctl restart nginx`);
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
+const startServer = () => {
+  try {
+    console.log("util server started", new Date().toString());
+    app.listen(PORT, () => {
+      console.log("util server running on PORT", PORT);
+    });
   } catch (error) {
     console.log("error in starting util server", error.message);
     process.exit(0);
   }
-})();
+};
+
+startServer();
