@@ -9,7 +9,8 @@ apt upgrade -y
 echo "Starting setup process";
 echo "Installing dependancies.";
 apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev -y
-apt-get install nload wondershaper
+apt-get install nload wondershaper -y
+apt-get install snapd -y
 echo "Intalling dependancie complete.";
 echo "Downloading rtmp module and files.";
 cd ~
