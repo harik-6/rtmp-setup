@@ -33,7 +33,7 @@ mv /usr/local/nginx/conf/nginx.conf /usr/local/nginx/conf/original.nginx.conf
 mv rtmp-setup/nginx.conf /usr/local/nginx/conf/;
 mv rtmp-setup/stat.xsl /usr/local/nginx/html/;
 echo "Creating hls drirectory and adding root access";
-cd /usr/local/nginx/conf && sudo mkdir /nginx
+cd /usr/local/nginx/conf && mkdir /nginx
 mkdir /nginx/hls
 chown -R www-data:www-data /nginx
 cd ~
