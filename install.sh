@@ -4,12 +4,12 @@ reset=`tput sgr0`;
 echo "=======================================================================================";
 echo "=======================================================================================";
 echo "Updating ubuntu pacakges";
-sudo apt update -y
-sudo apt upgrade -y
+apt update -y
+apt upgrade -y
 echo "Starting setup process";
 echo "Installing dependancies.";
-sudo apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev -y
-sudo apt-get install nload wondershaper
+apt-get install build-essential libpcre3 libpcre3-dev libssl-dev zlib1g zlib1g-dev -y
+apt-get install nload wondershaper
 echo "Intalling dependancie complete.";
 echo "Downloading rtmp module and files.";
 cd ~
@@ -23,8 +23,8 @@ echo "Configuration rtmp.This might take some time...";
 cd nginx-1.21.5 && ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module
 echo "Configuration rtmp done.OK";
 echo "Running install....."
-sudo make
-sudo make install
+make
+make install
 cd ..
 echo "Nginx-Rtmp setup complete.";
 echo "Renaming existing conf file and creating new conf"
@@ -34,8 +34,8 @@ mv rtmp-setup/nginx.conf /usr/local/nginx/conf/;
 mv rtmp-setup/stat.xsl /usr/local/nginx/html/;
 echo "Creating hls drirectory and adding root access";
 cd /usr/local/nginx/conf && sudo mkdir /nginx
-sudo mkdir /nginx/hls
-sudo chown -R www-data:www-data /nginx
+mkdir /nginx/hls
+chown -R www-data:www-data /nginx
 cd ~
 echo "Adding nginx to startup";
 mv rtmp-setup/nginx.service /lib/systemd/system/nginx.service
@@ -62,7 +62,7 @@ echo "==========================================================================
 echo "=======================================================================================";
 echo "Installing node environment";
 cd ~
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
 sleep 5s;
 chmod +x nvminstall.sh
 sh nvminstall.sh
