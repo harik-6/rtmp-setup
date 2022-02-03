@@ -31,25 +31,35 @@ app.post("/update", async (req, res) => {
       status: "success",
       message: "update started",
     });
-    console.log("creating temp dir");
+    console.log(
+      "---------------------------UPDATE STARTED---------------------------------"
+    );
+    console.log("Stopping SW server");
+    await executeCmd("pm2 stop sw");
+    console.log("Creating 'temp' directory");
     await executeCmd("mkdir temp");
-    console.log("cloning repo");
+    console.log("Cloning repo");
     await executeCmd(
       "cd temp && git clone https://github.com/harik-6/rtmp-setup.git && cd .."
     );
-    console.log("removing src dir");
+    console.log("Removing present 'src' directory");
     await executeCmd("rm -rf ~/rtmp-setup/src");
-    console.log("moving package.json and src dir");
+    console.log("Updating 'src' directory");
     await executeCmd("mv ~/rtmp-setup/temp/rtmp-setup/src ~/rtmp-setup/src");
+    console.log("Updating 'package.json' file");
     await executeCmd(
       "mv ~/rtmp-setup/temp/rtmp-setup/package.json ~/rtmp-setup/package.json"
     );
-    console.log("installing dep");
+    console.log("Installing npm dependacies");
     await executeCmd("cd ~/rtmp-setup && npm install");
-    console.log("cleaning up temp");
+    console.log("Cleaning up 'temp' directory");
     await executeCmd("rm -rf ~/rtmp-setup/temp");
-    console.log("restarting sw server");
+    console.log("Restarting SW server");
     await executeCmd("pm2 restart sw");
+    console.log("GET call to server/api/ping to check new version number");
+    console.log(
+      "---------------------------UPDATE COMPLETED---------------------------------"
+    );
   } catch (e) {
     console.error("Error in updating code", e);
   }
