@@ -38,9 +38,9 @@ app.post("/update", async (req, res) => {
       "cd temp && git clone https://github.com/harik-6/rtmp-setup.git && cd .."
     );
     console.log("moving package.json and src dir");
-    await executeCmd("mv ~/rtmp-setup/temp/src ~/rtmp-setup/src");
+    await executeCmd("mv ~/rtmp-setup/temp/rtmp-setup/src ~/rtmp-setup/src");
     await executeCmd(
-      "mv ~/rtmp-setup/temp/package.json ~/rtmp-setup/package.json"
+      "mv ~/rtmp-setup/temp/rtmp-setup/package.json ~/rtmp-setup/package.json"
     );
     console.log("installing dep");
     await executeCmd("cd ~/rtmp-setup && npm install");
