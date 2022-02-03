@@ -1,6 +1,6 @@
 {
   "name": "sw-server",
-  "version": "3.1.2",
+  "version": "legacy-3.1.2",
   "description": "",
   "main": "server.js",
   "scripts": {
