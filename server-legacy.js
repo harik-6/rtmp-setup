@@ -25,7 +25,16 @@ const executeCmd = async (command) => {
   });
 };
 
-app.post("/update", async (req, res) => {
+app.post("/legacy/ping", async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    payload: {
+      health: "OK",
+    },
+  });
+});
+
+app.post("/legacy/update", async (req, res) => {
   try {
     res.status(200).json({
       status: "success",
