@@ -86,6 +86,17 @@ app.get("/api/ping", async (_, res) => {
   });
 });
 
+// to health ping
+app.get("/api/ping/v1", async (_, res) => {
+  res.status(200).json({
+    status: "success",
+    payload: {
+      health: "OK",
+      version: "testing new endpoint",
+    },
+  });
+});
+
 //hls count
 app.get("/api/hls", async (_, res) => {
   try {
