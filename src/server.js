@@ -1,7 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const fs = require("fs");
-const packagejson = require("./package.json");
+const packagejson = require("../package.json");
 
 //exe
 const { exec } = require("child_process");
@@ -19,15 +19,6 @@ app.use(
   })
 );
 app.use(helmet());
-// app.use((req, res, next) => {
-//   if (req.headers.origin === "api.streamwell.in") {
-//     next();
-//   } else {
-//     res.status(401).json({
-//       error: "unauthorized",
-//     });
-//   }
-// });
 
 //=================================
 
