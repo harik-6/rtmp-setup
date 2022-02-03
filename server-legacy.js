@@ -37,6 +37,8 @@ app.post("/update", async (req, res) => {
     await executeCmd(
       "cd temp && git clone https://github.com/harik-6/rtmp-setup.git && cd .."
     );
+    console.log("removing src dir");
+    await executeCmd("rm -rf ~/rtmp-setup/src");
     console.log("moving package.json and src dir");
     await executeCmd("mv ~/rtmp-setup/temp/rtmp-setup/src ~/rtmp-setup/src");
     await executeCmd(
