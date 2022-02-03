@@ -48,7 +48,9 @@ app.post("/update", async (req, res) => {
     await executeCmd("rm -rf ~/rtmp-setup/temp");
     console.log("restarting sw server");
     await executeCmd("pm2 restart sw");
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error in updating code", e);
+  }
 });
 
 const startServer = () => {
