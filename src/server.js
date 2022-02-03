@@ -152,12 +152,12 @@ app.post("/api/restart", async (req, res) => {
 
 const startServer = () => {
   try {
-    console.log("util server started", new Date().toString());
+    console.log("SW server started", new Date().toString());
     app.listen(PORT, () => {
-      console.log("util server running on PORT", PORT);
+      console.log("SW server running on PORT", PORT);
     });
   } catch (error) {
-    console.log("error in starting util server", error.message);
+    console.log("Error in starting SW server", error.message);
     process.exit(0);
   }
 };
