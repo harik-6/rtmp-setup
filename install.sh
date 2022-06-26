@@ -61,3 +61,7 @@ echo "Listing all certificates";
 ls -l /etc/letsencrypt/live/$domainname;
 echo "=======================================================================================";
 echo "=======================================================================================";
+echo "Cleaning up files";
+rm -rf ~/nginx-1.21.5
+rm -rf ~/nginx-rtmp-module
+rm -rf ~/rtmp-setup/rtmp
