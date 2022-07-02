@@ -76,9 +76,9 @@ app.post("/legacy/update", async (req, res) => {
 
 const startServer = () => {
   try {
-    console.log("Legacy server started", new Date().toString());
+    console.log("SW-Legacy server started", new Date().toString());
     app.listen(PORT, () => {
-      console.log("Legacy server running on PORT", PORT);
+      console.log("SW-Legacy server running on PORT", PORT);
     });
   } catch (error) {
     console.log("Error in starting legacy server", error.message);
