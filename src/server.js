@@ -9,7 +9,8 @@ const { exec } = require("child_process");
 //variables
 const app = express();
 const PORT = 9000;
-const NGINX_CONF_FILE = "/usr/local/nginx/conf/nginx.conf"
+const NGINX_CONF_FILE = "/usr/local/nginx/conf/nginx.conf";
+const NGINX_CONF_VALIDATE = "/usr/local/nginx/sbin/nginx -t";
 
 // configuring server
 app.use(express.json());
@@ -70,6 +71,23 @@ app.get("/api/config", async (_, res) => {
     const stringyfied = conf.toString();
     res.status(200).json({
       payload: stringyfied,
+      status: 'success'
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      error: err.message,
+    });
+  }
+});
+
+// to edit a file
+app.put("/api/config", async (req, res) => {
+  try {
+    const contents = req.body.data;
+    fs.writeFileSync(NGINX_CONF_FILE, contents, { encoding: "utf8" });
+    await executeCmd(NGINX_CONF_VALIDATE);
+    res.status(200).json({
       status: 'success'
     })
   } catch (err) {
