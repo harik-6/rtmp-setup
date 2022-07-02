@@ -1,6 +1,5 @@
 const express = require("express");
 const helmet = require("helmet");
-const fs = require("fs");
 const packagejson = require("../package.json");
 const bodyparser = require("body-parser");
 
