@@ -10,8 +10,6 @@ const { exec } = require("child_process");
 //variables
 const app = express();
 const PORT = 9000;
-const NGINX_CONF_FILE = "/usr/local/nginx/conf/nginx.conf";
-const NGINX_CONF_VALIDATE = "/usr/local/nginx/sbin/nginx -t";
 
 // configuring server
 app.use(express.json());
@@ -60,43 +58,6 @@ app.post("/api/restart", async (_, res) => {
       status: "success",
     });
   } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      error: err.message,
-    });
-  }
-});
-
-// to view the config file
-app.get("/api/config", async (_, res) => {
-  try {
-    const conf = fs.readFileSync(NGINX_CONF_FILE, { encoding: "utf8" });
-    const stringyfied = conf.toString();
-    res.status(200).json({
-      payload: stringyfied,
-      status: 'success'
-    })
-  } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      error: err.message,
-    });
-  }
-});
-
-// to edit a file
-app.post("/api/config", async (req, res) => {
-  const presentConfiguration = fs.readFileSync(NGINX_CONF_FILE, { encoding: "utf8" });
-  try {
-    const contents = req.body.payload;
-    fs.writeFileSync(NGINX_CONF_FILE, contents, { encoding: "utf8" });
-    await executeCmd(NGINX_CONF_VALIDATE);
-    res.status(200).json({
-      status: 'success'
-    })
-  } catch (err) {
-    console.log("error while updating. overriding with previous conf file");
-    fs.writeFileSync(NGINX_CONF_FILE, presentConfiguration.toString(), { encoding: "utf8" });
     res.status(500).json({
       status: "failed",
       error: err.message,
