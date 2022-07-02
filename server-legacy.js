@@ -64,7 +64,7 @@ app.post("/legacy/update", async (req, res) => {
     console.log("Cleaning up 'temp' directory");
     await executeCmd("rm -rf ~/rtmp-setup/temp");
     console.log("Restarting SW server");
-    await executeCmd("pm2 restart sw");
+    await executeCmd("pm2 restart sw-server");
     console.log("GET call to server/api/ping to check new version number");
     console.log(
       "---------------------------UPDATE COMPLETED---------------------------------"
