@@ -85,7 +85,7 @@ app.get("/api/config", async (_, res) => {
 app.post("/api/config", async (req, res) => {
   const presentConfiguration = fs.readFileSync(NGINX_CONF_FILE, { encoding: "utf8" });
   try {
-    const contents = req.body.data;
+    const contents = req.body.data.toString();
     fs.writeFileSync(NGINX_CONF_FILE, contents, { encoding: "utf8" });
     await executeCmd(NGINX_CONF_VALIDATE);
     res.status(200).json({
