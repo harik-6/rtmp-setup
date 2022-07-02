@@ -83,6 +83,7 @@ app.get("/api/config", async (_, res) => {
 
 // to edit a file
 app.put("/api/config", async (req, res) => {
+  const presentConfiguration = fs.readFileSync(NGINX_CONF_FILE, { encoding: "utf8" });
   try {
     const contents = req.body.data;
     fs.writeFileSync(NGINX_CONF_FILE, contents, { encoding: "utf8" });
@@ -91,6 +92,8 @@ app.put("/api/config", async (req, res) => {
       status: 'success'
     })
   } catch (err) {
+    console.log("error while updating. overriding with previous conf file");
+    fs.writeFileSync(NGINX_CONF_FILE, presentConfiguration.toString(), { encoding: "utf8" });
     res.status(500).json({
       status: "failed",
       error: err.message,
