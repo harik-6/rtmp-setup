@@ -2,6 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const fs = require("fs");
 const packagejson = require("../package.json");
+const bodyparser = require("body-parser");
 
 //exe
 const { exec } = require("child_process");
@@ -19,6 +20,8 @@ app.use(
     extended: true,
   })
 );
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(helmet());
 
 //=================================
