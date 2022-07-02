@@ -82,7 +82,7 @@ app.get("/api/config", async (_, res) => {
 });
 
 // to edit a file
-app.put("/api/config", async (req, res) => {
+app.post("/api/config", async (req, res) => {
   const presentConfiguration = fs.readFileSync(NGINX_CONF_FILE, { encoding: "utf8" });
   try {
     const contents = req.body.data;
