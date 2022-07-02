@@ -95,7 +95,7 @@ app.post("/api/config", async (req, res) => {
       status: 'success'
     })
   } catch (err) {
-    console.log("error while updating. overriding with previous conf file", err);
+    console.log("error while updating. overriding with previous conf file");
     fs.writeFileSync(NGINX_CONF_FILE, presentConfiguration.toString(), { encoding: "utf8" });
     res.status(500).json({
       status: "failed",
