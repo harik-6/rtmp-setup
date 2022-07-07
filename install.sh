@@ -61,31 +61,7 @@ echo "Listing all certificates";
 ls -l /etc/letsencrypt/live/$domainname;
 echo "=======================================================================================";
 echo "=======================================================================================";
-echo "Installing node environment";
-cd ~
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > nvminstall.sh;
-sleep 5s;
-chmod +x nvminstall.sh
-sh nvminstall.sh
-sleep 5s;
-export NVM_DIR="$HOME/.nvm";
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion";
-echo "Installing node v16.13.1";
-nvm install v16.13.1;
-rm nvminstall.sh
-echo "${green} Installing done.OK ${reset}";
-echo "Installing node modules.";
-cd ~/rtmp-setup;
-npm install;
-echo "${green} Node modules installation done.OK ${reset}";
-echo "Adding pm2 to start up"
-npm install pm2 -g;
-pm2 startup;
-echo "${green} Server setup done.OK ${reset}";
-echo "=======================================================================================";
-echo "=======================================================================================";
 echo "Cleaning up files";
 rm -rf ~/nginx-1.21.5
 rm -rf ~/nginx-rtmp-module
-rm -rf ~/rtmp-setup/rtmp
+rm -rf ~/rtmp-setup
